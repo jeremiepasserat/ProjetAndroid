@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+
 public class Connexion extends AppCompatActivity {
 
     @Override
@@ -37,10 +38,11 @@ public class Connexion extends AppCompatActivity {
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("U just got a notif braw")
-                .setSmallIcon(R.drawable.notification)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle(getResources().getString(R.string.notification_title))
                 .setContentText(getResources().getString(R.string.notification_desc))
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setVibrate(new long[] {0,200,150,200});
 
         notificationManager.notify(1, builder.build());
     }
