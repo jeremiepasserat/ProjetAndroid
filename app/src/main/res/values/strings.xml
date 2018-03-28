@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ProjetAndroid</string>
     <string name="title_activity_navigation">Map</string>
+    <string name="notification">Aix en Bus</string>
+    <string name="notification_title">Aix en Bus</string>
+    <string name="notification_desc">Retard sur la ligne 42 à cause d\'un sandwich sur la route. Prévoyer 5 heures de retard</string>
+
 </resources>
