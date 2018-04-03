@@ -3,6 +3,14 @@
     <string name="title_activity_navigation">Map</string>
     <string name="notification">Aix en Bus</string>
     <string name="notification_title">Aix en Bus</string>
-    <string name="notification_desc">Retard sur la ligne 42 à cause d\'un sandwich sur la route. Prévoyer 5 heures de retard</string>
+    <string name="notification_desc">Retard sur la ligne 42 à cause d\'un sandwich sur la route. Prévoyez 5 heures de retard</string>
+
+    <string name="action_settings">Settings</string>
+    <!-- Button text -->
+    <string name="btn_logout_from_google">Logout</string>
+    <string name="btn_revoke_access">Revoke Access</string>
 
 </resources>
+
+
+

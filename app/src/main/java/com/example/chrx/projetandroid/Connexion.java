@@ -11,7 +11,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -33,6 +38,9 @@ public class Connexion extends AppCompatActivity {
     private static int RC_SIGN_IN = 100;
     private static final String TAG = "EmailPassword";
     private FirebaseAuth mAuth;
+    private ImageView imgProfilePic;
+    private TextView txtName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +93,9 @@ public class Connexion extends AppCompatActivity {
                 }
             }
         });
+
+        imgProfilePic = (ImageView) findViewById(R.id.imgProfilePic);
+        txtName = (TextView) findViewById(R.id.txtName);
     }
 
     private void signIn() {
@@ -117,6 +128,22 @@ public class Connexion extends AppCompatActivity {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+
+                Log.e(TAG, "display name: " + account.getDisplayName());
+
+                String personName = account.getDisplayName();
+                String personPhotoUrl = account.getPhotoUrl().toString();
+
+                Log.e(TAG, "Name: " + personName
+                        + ", Image: " + personPhotoUrl);
+
+                txtName.setText("Bienvenue " + personName + " ! ");
+                Glide.with(getApplicationContext()).load(personPhotoUrl)
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(imgProfilePic);
+
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
@@ -137,10 +164,12 @@ public class Connexion extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
+
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Snackbar.make(findViewById(R.id.main_layout), "COMME ON SE RETROUVE VILLAGEOIS !", Snackbar.LENGTH_SHORT).show();
                             updateUI(user);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -158,11 +187,17 @@ public class Connexion extends AppCompatActivity {
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.buttonMap).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
-            createNotification();
+            //createNotification();
+            imgProfilePic = (ImageView) findViewById(R.id.imgProfilePic);
+            txtName = (TextView) findViewById(R.id.txtName);
+            imgProfilePic.setVisibility(View.VISIBLE);
+            txtName.setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.buttonMap).setVisibility(View.GONE);
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.GONE);
+            imgProfilePic.setVisibility(View.GONE);
+            txtName.setVisibility(View.GONE);
         }
     }
 
