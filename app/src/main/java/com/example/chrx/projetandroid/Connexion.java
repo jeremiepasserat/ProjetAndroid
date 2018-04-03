@@ -1,5 +1,8 @@
 package com.example.chrx.projetandroid;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -155,10 +158,30 @@ public class Connexion extends AppCompatActivity {
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.buttonMap).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+            createNotification();
         } else {
             findViewById(R.id.buttonMap).setVisibility(View.GONE);
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.GONE);
         }
+    }
+
+
+    private void createNotification(){
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        final Intent intentNotification = new Intent(this, Connexion.class);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this,1 , intentNotification,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        Notification.Builder builder = new Notification.Builder(this)
+                .setWhen(System.currentTimeMillis())
+                .setTicker("U just got a notif braw")
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setContentTitle(getResources().getString(R.string.notification_title))
+                .setContentText(getResources().getString(R.string.notification_desc))
+                .setContentIntent(pendingIntent)
+                .setVibrate(new long[] {0,200,150,200});
+
+        notificationManager.notify(1, builder.build());
     }
 }
