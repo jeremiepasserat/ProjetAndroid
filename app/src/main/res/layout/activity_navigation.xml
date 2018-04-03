@@ -5,4 +5,16 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.chrx.projetandroid.Navigation" />
+    tools:context="com.example.chrx.projetandroid.Navigation">
+
+
+<Button
+android:id="@+id/accueil"
+android:layout_width="53dp"
+android:layout_height="55dp"
+android:layout_marginBottom="15dp"
+android:layout_marginStart="17dp"
+android:layout_marginTop="16dp"
+android:background="@drawable/index_test"/>
+
+    </fragment>
