@@ -188,21 +188,11 @@ public class Navigation extends FragmentActivity implements OnMapReadyCallback {
     //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER)
 
 
-
+    // A voir si la création d'une classe Arrêt (latitude, longitude, nom) peut s'imopser
 
     public ArrayList<String> getLatitude(ArrayList<String> coordonnees) {
         ArrayList<String> latitudes = new ArrayList<>();
         ArrayList<String> tmp = new ArrayList<>();
-
-       /* for (String s : coordonnees)
-        {
-            int i = 0;
-            while(s.charAt(i) != '*') {
-                ++i;
-            }
-            System.out.println(s.substring(0,i-1));
-            System.out.println(s.substring(i+2));
-        }*/
 
         //Traitement pour enlever les noms d'arrêt des Strings
 
