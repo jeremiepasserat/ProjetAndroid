@@ -1,6 +1,9 @@
  package com.example.chrx.projetandroid;
 
         import android.Manifest;
+        import android.app.Notification;
+        import android.app.NotificationManager;
+        import android.app.PendingIntent;
         import android.content.Context;
         import android.content.Intent;
         import android.content.pm.PackageManager;
@@ -38,12 +41,14 @@
         import android.os.StrictMode;
         import android.view.View;
         import android.widget.Button;
+        import android.widget.Toast;
 
 
  public class Navigation extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Marker oldmarker;
+    private String arretnotifie = "";
 
 
 
@@ -57,9 +62,13 @@
         StrictMode.setThreadPolicy(policy);
 
 
+
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
 
         Button button = findViewById(R.id.accueil);
         button.setOnClickListener(new View.OnClickListener() {
@@ -120,21 +129,11 @@
     public void onMapReady(final GoogleMap googleMap) {
         mMap = googleMap;
 
-        ArrayList<String> latitudes = getLatitude(getCoordonnees());
-        ArrayList<String> longitudes = getLongitude(getCoordonnees());
-        ArrayList<String> nomArrets = getNomArret(getCoordonnees());
+        final ArrayList<String> latitudes = getLatitude(getCoordonnees());
+        final ArrayList<String> longitudes = getLongitude(getCoordonnees());
+        final ArrayList<String> nomArrets = getNomArret(getCoordonnees());
 
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) &&
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED)) {
 
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, 1
-            );
-        }
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(43.514591, 5.451379);
@@ -150,7 +149,17 @@
 
 
         // demande à l'utilisateur les droits pour la géolocalisation.
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED)) {
 
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 1
+            );
+        }
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -161,9 +170,17 @@
             oldmarker = mMap.addMarker(new MarkerOptions().position(position).title("Vous êtes ici").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
+            getArretAMoinsdeDixMetres(position, latitudes, longitudes, nomArrets);
+            /* if (getArretAMoinsdeDixMetres(position) != "")
+            {
+                createNotification("Tu as un nouveau message !!");
+            }*/
+
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+
+
 
 
         //mise à jour de la position de manière périodique
@@ -177,6 +194,8 @@
                     oldmarker = mMap.addMarker(new MarkerOptions().position(position).title("Vous êtes ici").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
+                    getArretAMoinsdeDixMetres(position, latitudes, longitudes, nomArrets);
+
 
 
                 }
@@ -276,6 +295,52 @@
             arrets.add(s.substring(0, i - 1));
         }
         return arrets;
+    }
+
+
+     private void createNotification(String message){
+         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+         final Intent intentNotification = new Intent(this, Connexion.class);
+         final PendingIntent pendingIntent = PendingIntent.getActivity(this,1 , intentNotification,
+                 PendingIntent.FLAG_ONE_SHOT);
+
+         Notification.Builder builder = new Notification.Builder(this)
+                 .setWhen(System.currentTimeMillis())
+                 .setTicker("U just got a notif braw")
+                 .setSmallIcon(R.mipmap.ic_launcher_round)
+                 .setContentTitle(getResources().getString(R.string.notification_title))
+                 .setContentText(message)
+                 .setContentIntent(pendingIntent)
+                 .setVibrate(new long[] {0,200,150,200});
+
+         notificationManager.notify(1, builder.build());
+     }
+    public void getArretAMoinsdeDixMetres (LatLng position, ArrayList<String> latitudes, ArrayList<String> longitudes, ArrayList<String> nomArrets)
+    {
+        String arretsadistance = "";
+
+
+        float [] results = new float[2];
+
+
+        //Toast.makeText(Navigation.this,Double.toString(position.latitude),Toast.LENGTH_SHORT).show();
+        for (int i = 0; i<latitudes.size(); ++i)
+        {
+            Location.distanceBetween(position.latitude, position.longitude, Double.parseDouble(latitudes.get(i)), Double.parseDouble(longitudes.get(i)), results );
+            //Toast.makeText(Navigation.this, Float.toString(results[0]),Toast.LENGTH_SHORT).show();
+
+            if (results[0] < 100 && !arretnotifie.equals(nomArrets.get(i)))
+            {
+
+                arretnotifie = nomArrets.get(i);
+                createNotification(arretnotifie + " à moins de 100 mètres");
+                //double lat_encours = Double.parseDouble(latitudes.get(i));
+                //double long_encours = Double.parseDouble(longitudes.get(i));
+                break;
+            }
+        }
+
+        //Toast.makeText(Navigation.this, arretnotifie, Toast.LENGTH_SHORT).show();
     }
 
 
