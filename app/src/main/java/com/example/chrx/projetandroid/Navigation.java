@@ -61,12 +61,23 @@
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-
-
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            mapFragment.getMapAsync(this);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION}, 1
+            );
+
+        }
+
+
+
+
 
 
 
@@ -148,6 +159,10 @@
         }
 
 
+
+
+
+    /*
         // demande à l'utilisateur les droits pour la géolocalisation.
         if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) &&
@@ -159,7 +174,7 @@
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION}, 1
             );
-        }
+        }*/
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -167,9 +182,10 @@
         try {
             Location location = new Location(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
             LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-            oldmarker = mMap.addMarker(new MarkerOptions().position(position).title("Vous êtes ici").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            //oldmarker = mMap.addMarker(new MarkerOptions().position(position).title("Vous êtes ici").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
+            mMap.setMyLocationEnabled(true);
             getArretAMoinsdeDixMetres(position, latitudes, longitudes, nomArrets);
             /* if (getArretAMoinsdeDixMetres(position) != "")
             {
@@ -177,6 +193,8 @@
             }*/
 
         } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (SecurityException e){
             e.printStackTrace();
         }
 
@@ -190,8 +208,8 @@
                 public void onLocationChanged(Location location) {
                     Log.d("GPS", "Latitude " + location.getLatitude() + " et longitude " + location.getLongitude());
                     LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                    oldmarker.remove();
-                    oldmarker = mMap.addMarker(new MarkerOptions().position(position).title("Vous êtes ici").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                   // oldmarker.remove();
+                   // oldmarker = mMap.addMarker(new MarkerOptions().position(position).title("Vous êtes ici").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
                     getArretAMoinsdeDixMetres(position, latitudes, longitudes, nomArrets);
@@ -217,7 +235,10 @@
             });
         } catch (NullPointerException e) {
             e.printStackTrace();
+        }catch (SecurityException e){
+            e.printStackTrace();
         }
+
 
 
     }
